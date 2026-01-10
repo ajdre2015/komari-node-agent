@@ -1,0 +1,25 @@
+services:
+  komari-node-agent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: komari-node-agent
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      TZ: "Asia/Shanghai"
+      REPORT_INTERVAL_MS: "1000"
+      INFO_INTERVAL_MS: "300000"
+      RECONNECT_INTERVAL_MS: "5000"
+      DISK_PATH: "/"
+      LOG_LEVEL: "debug"
+      LOG_WS_SEND: "true"
+      LOG_WS_EVERY: "1"
+      LOG_WS_MAXLEN: "8000"
+      # uptime source: auto|pid1|process
+      
+      UPTIME_SOURCE: "process"
+
+      # ram fallback: host|zero
+      RAM_TOTAL_FALLBACK: "host"

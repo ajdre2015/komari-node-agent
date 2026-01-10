@@ -1,0 +1,10 @@
+{
+  "name": "komari-node-agent",
+  "version": "1.0.7",
+  "main": "index.js",
+  "type": "commonjs",
+  "license": "MIT",
+  "dependencies": {
+    "ws": "^8.16.0"
+  }
+}
