@@ -19,7 +19,7 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '18' # 建议使用 LTS 版本
-        cache: 'npm'
+        #cache: 'npm'
 
     # 3. 安装项目依赖
     - name: Install dependencies
