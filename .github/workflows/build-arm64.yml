@@ -1,0 +1,48 @@
+name: Build Linux ARM64 Binary
+
+on:
+  push:
+    branches: [ "main" ]  # 监听 main 分支的推送
+  workflow_dispatch:      # 允许手动触发
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. 检出代码
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # 2. 设置 Node.js 环境
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18' # 建议使用 LTS 版本
+        cache: 'npm'
+
+    # 3. 安装项目依赖
+    - name: Install dependencies
+      run: npm install
+
+    # 4. 安装打包工具 pkg
+    - name: Install pkg
+      run: npm install -g pkg
+
+    # 5. 执行打包命令
+    # -t (targets): 指定目标环境。格式为 node版本-平台-架构
+    # -o (output): 指定输出文件名
+    - name: Build for Linux ARM64
+      run: |
+        pkg . -t node18-linux-arm64 -o my-app-arm64
+    
+    # 注意：如果你的项目有 assets (html, css 等静态文件) 需要被打包，
+    # 请在 package.json 中配置 "pkg": { "assets": [...] }
+
+    # 6. 上传构建产物
+    # 这样你就可以在 GitHub Actions 的 Summary 页面下载到编译好的文件
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: linux-arm64-binary
+        path: my-app-arm64
