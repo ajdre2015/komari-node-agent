@@ -141,6 +141,13 @@ class ContainerMetrics {
         if (x.family === 'IPv6' && !ipv6) ipv6 = x.address;
       }
     }
+	
+	    // ✅ 新增：如果拿到的是内网 IPv4，用环境变量替换
+    const envV4 = (process.env.KOMARI_IPV4 || '').trim();
+    if (ipv4 && this._isPrivateIpv4(ipv4) && envV4) {
+      ipv4 = envV4;
+    }
+	
     return { ipv4, ipv6 };
   }
 
@@ -508,6 +515,27 @@ class ContainerMetrics {
     const n = parseInt(String(x).trim(), 10);
     return Number.isFinite(n) ? n : null;
   }
+  
+  _isPrivateIpv4(ip) {
+    if (!ip) return false;
+    const parts = String(ip).trim().split('.').map(n => parseInt(n, 10));
+    if (parts.length !== 4 || parts.some(n => !Number.isFinite(n) || n < 0 || n > 255)) return false;
+
+    const [a, b] = parts;
+
+    // RFC1918
+    if (a === 10) return true;                          // 10.0.0.0/8
+    if (a === 172 && b >= 16 && b <= 31) return true;   // 172.16.0.0/12
+    if (a === 192 && b === 168) return true;            // 192.168.0.0/16
+
+    // 常见“非公网”段
+    if (a === 127) return true;                         // loopback 127.0.0.0/8
+    if (a === 169 && b === 254) return true;            // link-local 169.254.0.0/16
+    if (a === 100 && b >= 64 && b <= 127) return true;  // CGNAT 100.64.0.0/10
+
+    return false;
+  }
+
 }
 
 module.exports = { ContainerMetrics };
